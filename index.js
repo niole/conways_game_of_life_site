@@ -1,11 +1,12 @@
 import { memory } from "wasm-game-of-life/wasm_game_of_life_bg";
-import {Game} from "wasm-game-of-life";
+import {Cell, Game} from "wasm-game-of-life";
 
 const gameDiv = document.createElement('div');
 
+const renderCell = c => c === Cell.Dead ? '◻' : '◼';
+
 document.body.append(gameDiv);
-const board = [0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0];
-const game = Game.new_board(board);
+const game = Game.new();
 render();
 
 setInterval(() => {
@@ -15,13 +16,13 @@ setInterval(() => {
 
 function render() {
   const gamePtr = game.board();
-  const board = new Uint8Array(memory.buffer, gamePtr, 16);
+  const board = new Uint8Array(memory.buffer, gamePtr, game.board().length);
   let line = '';
-  for (let i = 0; i < 16; i++) {
-    if (i%4 === 0 && i != 0) {
+  for (let i = 0; i < 1296; i++) {
+    if (i%game.row_size() === 0 && i !== 0) {
       line += '</br>';
     }
-    line += `${board[i]}`;
+    line += renderCell(board[i]);
   }
-  gameDiv.innerHTML = line;// game.render();
+  gameDiv.innerHTML = line;
 }
